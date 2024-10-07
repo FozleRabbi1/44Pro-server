@@ -9,32 +9,37 @@ import config from "../../config";
 
 
 const createUserIntoDB = async (payload: TUser) => {
-  const isStudentExists = await TampUserCollection.findOne({ email: payload.email });
-  const isStudentExistsInUser = await User.findOne({ email: payload.email });
+  
+  const isStudentExists = await TampUserCollection.findOne({ email: payload?.email });
+  const isStudentExistsInUser = await User.findOne({ email: payload?.email });
 
   if (isStudentExists || isStudentExistsInUser ) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // const otp = "112233";
   const expirationTime = new Date(Date.now() + 1 * 60 * 1000); 
 
-  const hashedPassword = await bcrypt.hash(payload.password, 8); 
+  const hashedPassword = await bcrypt.hash(payload?.password, 8); 
 
   const newUserData = {
-    email: payload.email,
+    email: payload?.email,
     password: hashedPassword,
-    name: payload.name,
+    name: payload?.name,
     otp,
     expiresAt: expirationTime, 
   };
 
-  await sendEmail(payload.email, otp);
+  await sendEmail(payload?.email, otp);
+
   await TampUserCollection.create(newUserData);
+
   return {
     success: true,
     message: 'OTP sent to your email. Please verify to complete registration.',
   };
+
 };
 
 
@@ -78,12 +83,7 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
   if (!userData) {
     throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
   }
-  // =================================>>>>>  checking if the password is correct or not
-  // if (!(await User.isPasswordMatched(paylod?.password, userData?.password))) {
-  //   throw new AppError(httpStatus.FORBIDDEN, 'password is not matched');
-  // }
-
-  const res = await bcrypt.compare(paylod.password, userData.password)
+    const res = await bcrypt.compare(paylod.password, userData.password)
   if(!res){
     throw new AppError(httpStatus.FORBIDDEN, 'password is not matched');
   }
@@ -93,7 +93,7 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
     // role: userData.role | "",
   };
   
-  // =========== jwt এর builting function
+
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
