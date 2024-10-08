@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import config from '../config';
 // import config from '../config';
 
 export const sendEmail = async (to: string, otp: string) => {
@@ -10,14 +11,14 @@ export const sendEmail = async (to: string, otp: string) => {
     secure: true,
     auth: {
       user: 'fozlerabbishuvo@gmail.com',
-      pass: 'qhdg kwxf pwgp dbho', 
+      pass: config.email_pass , 
     },
   });
 
   await transporter.sendMail({
     from: 'fozlerabbishuvo@gmail.com',
     to, 
-    subject: 'Set your OTP withen 10m', 
+    subject: 'Set your OTP withen 2m', 
     text: '', 
     html : `<div style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
         <p>Your OTP code is:</p>

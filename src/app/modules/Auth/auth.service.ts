@@ -10,16 +10,22 @@ import config from "../../config";
 
 const createUserIntoDB = async (payload: TUser) => {
   
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expirationTime = new Date(Date.now() + 1 * 60 * 1000); 
+
   const isStudentExists = await TampUserCollection.findOne({ email: payload?.email });
   const isStudentExistsInUser = await User.findOne({ email: payload?.email });
 
-  if (isStudentExists || isStudentExistsInUser ) {
+  if (isStudentExistsInUser ) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  // const otp = "112233";
-  const expirationTime = new Date(Date.now() + 1 * 60 * 1000); 
+  if(isStudentExists){    
+    await TampUserCollection.findOneAndUpdate({email : payload?.email}, {otp, expiresAt: expirationTime}, {new : true, runValidators : true})
+    await sendEmail(payload?.email, otp);
+    return
+  }
+
 
   const hashedPassword = await bcrypt.hash(payload?.password, 8); 
 
@@ -47,15 +53,16 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
   const tempUser = await TampUserCollection.findOne({ email });
   
   if (!tempUser) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
+    throw new AppError(httpStatus.BAD_REQUEST, 'User not found Try again');
   }
 
-  if (tempUser.otp !== otp) {
+  if (tempUser.otp !== otp) {    
     throw new AppError(400, 'OTP not matched, try again');
   }
   if (tempUser.expiresAt < new Date()) {
     throw new AppError(400, 'OTP has expired, please request a new one');
   }
+
   const lastDocument = await User.findOne().sort({ _id: -1 }).exec();
   const lastDocumentId = lastDocument?.Id || 0;
 
@@ -93,7 +100,6 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
     // role: userData.role | "",
   };
   
-
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
@@ -109,6 +115,28 @@ const loginUserIntoDB = async (paylod: TLoginUser) => {
     refreshToken,
   };
 };
+
+
+const deleteExpiredUsers = async () => {
+    try {
+    const now = new Date();    
+    const expiredUsers = await TampUserCollection.find({ expiresAt: { $lte: now } });
+
+    if (expiredUsers.length > 0) {
+      console.log("deleted");      
+      await TampUserCollection.deleteMany({ expiresAt: { $lte: now } });
+    } else {
+      console.log("No expired users found");
+    }
+  } catch (error) {
+    console.error("Error deleting expired users:", error);
+    throw new AppError(500, "Failed to delete expired users");
+  }
+};
+setInterval(() => {
+  deleteExpiredUsers();
+}, 1 * 60 * 1000);
+
 
 
 
