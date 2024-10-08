@@ -16,5 +16,7 @@ exports.default = {
     jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
     jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
     pay_clien_id: process.env.PAYPLE_CLIENT_ID_TWO,
-    pay_clien_secret: process.env.PAYPLE_CLIENT_SECRET_TWO
+    pay_clien_secret: process.env.PAYPLE_CLIENT_SECRET_TWO,
+    email_pass: process.env.EMAIL_PASS,
+    email_port: process.env.EMAIL_PORT
 };

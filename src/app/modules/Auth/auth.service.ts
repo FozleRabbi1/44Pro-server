@@ -8,6 +8,12 @@ import { createToken } from "./auth.utils";
 import config from "../../config";
 
 
+const getAllUserFromDB = async () =>{
+  const result = await User.find()
+  return result
+}
+
+
 const createUserIntoDB = async (payload: TUser) => {
   
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -139,8 +145,8 @@ setInterval(() => {
 
 
 
-
   export const UserServices = {
+    getAllUserFromDB,
     createUserIntoDB,
     verifyOTPintoDB,
     loginUserIntoDB
