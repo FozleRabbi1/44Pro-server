@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 import { createToken } from "./auth.utils";
 import config from "../../config";
 import { sendEmailToUser } from "../../utils/sendEmailToUser";
+// import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 
 const getAllUserFromDB = async () =>{
@@ -97,6 +98,7 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
     message: 'User registered successfully!',
   };
 };
+
 
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
   const userData = await User.findOne({email : paylod.email});
