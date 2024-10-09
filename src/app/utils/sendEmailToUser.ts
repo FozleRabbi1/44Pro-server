@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import nodemailer from 'nodemailer';
 import config from '../config';
 
@@ -21,3 +22,30 @@ export const sendEmailToUser = async (to: string[], sub: string, message: string
     html: message,
   });
 };
+
+
+// import nodemailer from 'nodemailer';
+// import config from '../config';
+
+// export const sendEmailToUser = async (to: string[], sub: string, message: string, attachments: any[] = []) => {
+//   const transporter = nodemailer.createTransport({
+//     host: 'smtp.gmail.com',
+//     port: 465, 
+//     secure: true, 
+//     auth: {
+//       user: 'fozlerabbishuvo@gmail.com',
+//       pass: config.email_pass, 
+//     },
+//   });
+
+//   const recipientEmails = to.join(',');
+  
+//   await transporter.sendMail({
+//     from: 'fozlerabbishuvo@gmail.com',
+//     to: recipientEmails, 
+//     subject: sub, 
+//     text: '', 
+//     html: message,
+//     attachments, // Include attachments here
+//   });
+// };

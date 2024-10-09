@@ -17,8 +17,7 @@ const getAllUserFromDB = async () =>{
 }
 
 
-const createUserIntoDB = async (payload: TUser) => {
-  
+const createUserIntoDB = async (payload: TUser) => {  
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expirationTime = new Date(Date.now() + 1 * 60 * 1000); 
 
@@ -32,7 +31,6 @@ const createUserIntoDB = async (payload: TUser) => {
   }
 
   if(isStudentExists){   
-
     const data = {
       otp ,
       password : hashedPassword,
@@ -43,9 +41,6 @@ const createUserIntoDB = async (payload: TUser) => {
     return
   }
 
-
-  
-
   const newUserData = {
     email: payload?.email,
     password: hashedPassword,
@@ -55,14 +50,11 @@ const createUserIntoDB = async (payload: TUser) => {
   };
 
   await sendEmail(payload?.email, otp);
-
   await TampUserCollection.create(newUserData);
-
   return {
     success: true,
     message: 'OTP sent to your email. Please verify to complete registration.',
   };
-
 };
 
 
@@ -151,7 +143,7 @@ const deleteExpiredUsers = async () => {
 };
 setInterval(() => {
   deleteExpiredUsers();
-}, 1 * 60 * 1000);
+}, 10 * 60 * 1000);
 
 
 const sendEmailToAllUser = async (payload : any) =>{
