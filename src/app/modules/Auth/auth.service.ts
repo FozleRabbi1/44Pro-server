@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
 import { TLoginUser, TUser } from "./auth.interface";
 import { AppError } from "../../errors/AppErrors";
@@ -6,6 +7,7 @@ import { TampUserCollection, User } from "./auth.module";
 import bcrypt from 'bcrypt'; 
 import { createToken } from "./auth.utils";
 import config from "../../config";
+import { sendEmailToUser } from "../../utils/sendEmailToUser";
 
 
 const getAllUserFromDB = async () =>{
@@ -22,18 +24,26 @@ const createUserIntoDB = async (payload: TUser) => {
   const isStudentExists = await TampUserCollection.findOne({ email: payload?.email });
   const isStudentExistsInUser = await User.findOne({ email: payload?.email });
 
+  const hashedPassword = await bcrypt.hash(payload?.password, 8); 
+
   if (isStudentExistsInUser ) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
   }
 
-  if(isStudentExists){    
-    await TampUserCollection.findOneAndUpdate({email : payload?.email}, {otp, expiresAt: expirationTime}, {new : true, runValidators : true})
+  if(isStudentExists){   
+
+    const data = {
+      otp ,
+      password : hashedPassword,
+    }
+
+    await TampUserCollection.findOneAndUpdate({email : payload?.email}, data , {new : true, runValidators : true})
     await sendEmail(payload?.email, otp);
     return
   }
 
 
-  const hashedPassword = await bcrypt.hash(payload?.password, 8); 
+  
 
   const newUserData = {
     email: payload?.email,
@@ -87,8 +97,6 @@ const verifyOTPintoDB = async (email: string, otp: string) => {
     message: 'User registered successfully!',
   };
 };
-
-
 
 const loginUserIntoDB = async (paylod: TLoginUser) => {  
   const userData = await User.findOne({email : paylod.email});
@@ -144,10 +152,16 @@ setInterval(() => {
 }, 1 * 60 * 1000);
 
 
+const sendEmailToAllUser = async (payload : any) =>{
+  const result = await sendEmailToUser(payload?.email, payload?.subject, payload?.value)
+  return result;
+}
+
 
   export const UserServices = {
     getAllUserFromDB,
     createUserIntoDB,
     verifyOTPintoDB,
-    loginUserIntoDB
+    loginUserIntoDB,
+    sendEmailToAllUser
   };

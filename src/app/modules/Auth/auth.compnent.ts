@@ -4,6 +4,16 @@ import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./auth.service";
 import config from "../../config";
 
+const getAllUser = catchAsync(async (req, res) => {
+    const result = await UserServices.getAllUserFromDB();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Verify OTP',
+      data: result,
+    });
+  });
+
 const createUser = catchAsync(async (req, res) => {
     const { user: userData } = req.body;
     const result = await UserServices.createUserIntoDB(userData);
@@ -44,9 +54,22 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+const sendEmailToUser = catchAsync(async (req, res) => {
+  const result = await UserServices.sendEmailToAllUser(req.body);
+ 
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Email send  successfully',
+    data: result,
+  });
+});
+
 
   export const userController = {
+    getAllUser,
     createUser,
     verifyOTP,
-    loginUser
+    loginUser,
+    sendEmailToUser
   };

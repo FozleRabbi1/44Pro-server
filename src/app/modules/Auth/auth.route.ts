@@ -3,6 +3,12 @@ import { userController } from './auth.compnent';
 
 const router = express.Router();
 
+router.get(
+    '/',
+    // validateRequest(UserValidation.createUserValidationSchema),
+    userController.getAllUser,
+  );
+
 router.post(
     '/create-user',
     // validateRequest(UserValidation.createUserValidationSchema),
@@ -19,6 +25,12 @@ router.post(
     '/login',
     // validateRequest(UserValidation.createUserValidationSchema),
     userController.loginUser,
+  );
+
+router.post(
+    '/sendEmail',
+    // validateRequest(UserValidation.createUserValidationSchema),
+    userController.sendEmailToUser,
   );
 
 export const UserRouter = router;
