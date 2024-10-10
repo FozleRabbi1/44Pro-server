@@ -147,7 +147,8 @@ setInterval(() => {
 
 
 const sendEmailToAllUser = async (payload : any) =>{
-  const result = await sendEmailToUser(payload?.email, payload?.subject, payload?.value)
+  const { email, subject, value } = payload;
+  const result = await sendEmailToUser(email, subject, value)
   return result;
 }
 

@@ -23,4 +23,5 @@ export const sendEmailToUser = async (to: string[], sub: string, message: string
     text: '', 
     html: message,
   });
+  
 };
